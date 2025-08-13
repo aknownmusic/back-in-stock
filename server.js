@@ -14,7 +14,11 @@ const corsOptions = {
   maxAge: 86400
 };
 app.use(cors(corsOptions));
-app.options('*', cors(corsOptions)); // Handle preflight quickly
+
+// Handle OPTIONS preflight requests without triggering path-to-regexp bug
+app.options(/.*/, cors(corsOptions), (req, res) => {
+  res.sendStatus(204);
+});
 
 app.use(bodyParser.json());
 
@@ -28,7 +32,7 @@ const transporter = nodemailer.createTransport({
   secure: true,
   auth: {
     user: process.env.SMTP_USER, // your Gmail
-    pass: process.env.SMTP_PASS  // Gmail App Password
+    pass: process.env.SMTP_PASS  // Gmail App Password (remove spaces)
   }
 });
 
